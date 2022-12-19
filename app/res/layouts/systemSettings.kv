@@ -3,5 +3,74 @@
         orientation: "vertical"
 
         MDTopAppBar:
-            title: "MDTopAppBar"
-            left_action_items: [["dots-vertical", lambda x: root.open_system_settings_screen()]]
+            title: "Ajustes del sistema"
+            elevation: 4
+            left_action_items: [["arrow-left-bold", lambda x: root.open_home_screen()]]
+        MDCard:
+            size_hint: (1,0.3)
+            padding: 4
+            MDBoxLayout:
+                orientation:'vertical'
+                MDLabel:
+                    text:'Ajustes globales'
+                    halign:'center'
+                    bold: True
+                    size_hint: (1,0.2)
+                    font_size:dp(32)
+                MDRelativeLayout:
+                    size_hint_y: None
+                    height: text_field_number_screen.height
+
+                    MDTextField:
+                        id: text_field_number_screen
+                        hint_text: 'Numero de pantalla'
+                        text: ''
+                        mode: "rectangle"
+                        icon_left: "monitor-screenshot"
+
+                    MDIconButton:
+                        icon: "content-save"
+                        pos_hint: {"center_y": .5}
+                        pos: text_field_number_screen.width - self.width + dp(8), 0
+                        theme_text_color: "Hint"
+
+                MDRelativeLayout:
+                    size_hint_y: None
+                    height: text_field_url_api.height
+
+                    MDTextField:
+                        id: text_field_url_api
+                        hint_text: 'Url de la api base'
+                        text: ''
+                        mode: "rectangle"
+                        icon_left: "link-variant"
+
+                    MDIconButton:
+                        icon: "content-save"
+                        pos_hint: {"center_y": .5}
+                        pos: text_field_url_api.width - self.width + dp(8), 0
+                        theme_text_color: "Hint"
+        MDCard:
+            padding: 4
+            size_hint: (1,0.3)
+            MDBoxLayout:
+                orientation:'vertical'
+                MDLabel:
+                    text:'Atajos'
+                    halign:'center'
+                    bold: True
+                    size_hint: (1,0.2)
+                    font_size:dp(32)
+
+                MDLabel:
+                    text:'iniciar automaticamente al reiniciar windows'
+                MDSwitch:
+                    id: shCreateAutoLaunch
+                MDLabel:
+                    text:'Actualizaciones Automaticas'
+                MDSwitch:
+                    id: shUpdateAutomatic
+        MDFloatingActionButton:
+            icon: "content-save"
+            md_bg_color: app.theme_cls.primary_color
+            on_press: root.save_settings()

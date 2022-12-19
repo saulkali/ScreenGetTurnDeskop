@@ -3,7 +3,7 @@ import requests
 import pydantic
 
 from app.common.entities.turn_display_entity import TurnDisplayEntity
-import app.common.constants.api_settings as ApiSettings
+from global_system_config import GlobalSystemSettings
 
 class TurnsApiData:
 
@@ -20,7 +20,7 @@ class TurnsApiData:
         print("obteniendo los turnos")
         try:
             http_response = requests.get(
-                ApiSettings.host_base + ApiSettings.turns_by_room_endpoint + id_room.__str__(),
+                GlobalSystemSettings().api_settings.host_base + GlobalSystemSettings().api_settings.turns_by_room_endpoint + id_room.__str__(),
                 verify= False
             )
             if http_response.status_code == 200:

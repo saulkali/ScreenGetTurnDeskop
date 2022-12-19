@@ -1,5 +1,5 @@
 import requests
-import app.common.constants.api_settings as ApiSettings
+from global_system_config import GlobalSystemSettings
 
 from app.common.entities.room_office_display_entity import RoomOfficeDisplayEntity
 
@@ -18,7 +18,7 @@ class RoomApiData:
         room_office_display_entity: RoomOfficeDisplayEntity = None
         try:
             http_response = requests.get(
-                ApiSettings.host_base + ApiSettings.room_office_by_code + code.__str__(),
+                GlobalSystemSettings().api_settings.host_base + GlobalSystemSettings().api_settings.room_office_by_code + code.__str__(),
                 verify=False,
                 headers=headers
             )

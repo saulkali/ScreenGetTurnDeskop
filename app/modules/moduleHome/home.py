@@ -17,11 +17,10 @@ from app.common.business.room_business import RoomBusiness
 from app.common.business.signage_business import SignageBusiness
 
 from signalrcore.hub_connection_builder import HubConnectionBuilder
-import app.common.constants.api_settings as ApiSettings
 import logging
 import guid
 import app.common.values.integers as integers
-import app.common.constants.system_settings as SystemSettings
+from global_system_config import GlobalSystemSettings
 from kivy.clock import Clock
 
 Builder.load_file(getFile("app/res/layouts/home.kv"))
@@ -40,7 +39,8 @@ class ContentDialogTurnBoxLayout(BoxLayout):
             self.ids.label_title.text = "Turno"
             self.ids.label_name.text = self.turn_entity.turn
             self.ids.label_window.text = self.turn_entity.window
-
+    def set_name_turn(self,name:str):
+        self.ids.label_title.text = name
 
 class HomeScreen(MDScreen):
     sounds: Sounds = None
@@ -50,6 +50,7 @@ class HomeScreen(MDScreen):
 
     list_videos: list[str] = None
     position_video: int = 0
+    list_turn_call_await: list[TurnEntity] = []
     turns_business: TurnsBusiness = None
     room_business: RoomBusiness = None
     signage_business: SignageBusiness = None
@@ -60,10 +61,11 @@ class HomeScreen(MDScreen):
         super().__init__(*args, **kwargs)
 
         self.__setup_global_vars()
-        Clock.schedule_once(lambda *args: self.get_id_room(1))
+        Clock.schedule_once(lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
         Clock.schedule_once(lambda *args: self.__setup_singal_r())
         Clock.schedule_once(lambda *args: self.get_signage())
         self.__setup_video()
+
 
     def open_system_settings_screen(self):
         self.manager.current = "system-settings-screen"
@@ -78,7 +80,7 @@ class HomeScreen(MDScreen):
             print("mostrando lista de videos")
             print(self.list_videos)
             if len(self.list_videos) is not 0:
-                self.play_video(SystemSettings.path_files_videos + self.list_videos[self.position_video], True)
+                self.play_video(GlobalSystemSettings().system_settings.path_files_videos + self.list_videos[self.position_video], True)
         except Exception as error:
             Snackbar(text=f"Error al intentar obtener los videos {error}").open()
 
@@ -138,7 +140,7 @@ class HomeScreen(MDScreen):
                 Clock.schedule_once(
                     lambda *args: self.show_dialog_turn(f"turno {turn_entity.turn} {turn_entity.window}",
                                                         turn_entity))
-                Clock.schedule_once(lambda *args: self.get_id_room(1))
+                Clock.schedule_once(lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
 
     def on_get_turn(self,*args):
         '''
@@ -149,7 +151,7 @@ class HomeScreen(MDScreen):
         :return:
         '''
         print(args)
-        Clock.schedule_once(lambda *args: self.get_id_room(1))
+        Clock.schedule_once(lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
         Snackbar(text="nuevo turno agregado en espera").open()
 
     def __setup_singal_r(self):
@@ -160,16 +162,19 @@ class HomeScreen(MDScreen):
         try:
             print("connect websocket")
             self.hub_connection = HubConnectionBuilder() \
-                .with_url(ApiSettings.host_base + ApiSettings.hub_signal_r, options={
-                "verify_ssl": False
-            }) \
+                .with_url(
+                    GlobalSystemSettings().api_settings.host_base + GlobalSystemSettings().api_settings.hub_signal_r,
+                    options={
+                    "verify_ssl": False
+                    }
+                ) \
                 .configure_logging(logging.DEBUG) \
                 .with_automatic_reconnect({
-                "type": "raw",
-                "keep_alive_interval": 10,
-                "reconnect_interval": 5,
-                "max_attempts": 5
-            }).build()
+                    "type": "raw",
+                    "keep_alive_interval": 10,
+                    "reconnect_interval": 5,
+                    "max_attempts": 5
+                }).build()
 
             self.hub_connection.on_open(
                 lambda: print("connection opened and handshake received ready to send messages"))
@@ -177,11 +182,11 @@ class HomeScreen(MDScreen):
             self.hub_connection.on_error(lambda data: print(f"An exception was thrown closed{data.error}"))
 
             self.hub_connection.on(
-                ApiSettings.call_turn_endpoint + self.room_office_display_entity.idRoom.__str__(),
+                GlobalSystemSettings().api_settings.call_turn_endpoint + self.room_office_display_entity.idRoom.__str__(),
                 callback_function=self.on_call_turn
             )
             self.hub_connection.on(
-                ApiSettings.get_turn_endpoint + self.room_office_display_entity.idRoom.__str__(),
+                GlobalSystemSettings().api_settings.get_turn_endpoint + self.room_office_display_entity.idRoom.__str__(),
                 callback_function=self.on_get_turn
             )
             self.hub_connection.start()
@@ -216,10 +221,10 @@ class HomeScreen(MDScreen):
         self.position_video += 1
         if self.position_video > len(self.list_videos):
             self.position_video = 0
-        self.play_video(SystemSettings.path_files_videos + self.list_videos[self.position_video], True)
+        self.play_video(GlobalSystemSettings().system_settings.path_files_videos + self.list_videos[self.position_video], True)
 
 
-    def close_dialog_turn(self, *args):
+    def close_dialog_turn(self, turn_entity: TurnEntity):
         '''
         cierra el dialogo, o en otras palabras cierra el modal
         :param args:
@@ -227,9 +232,17 @@ class HomeScreen(MDScreen):
         '''
         if self.dialog is not None:
             self.dialog.dismiss()
+            self.dialog = None
             self.resumen_video()
             self.show_video()
-
+            if len(self.list_turn_call_await) is not 0:
+                print(f"======= {len(self.list_turn_call_await)} =========")
+                next_turn_entity: TurnEntity = self.list_turn_call_await.pop(0)
+                Clock.schedule_once(
+                    lambda *args: self.show_dialog_turn(f"turno {next_turn_entity.turn} {next_turn_entity.window}",
+                                                        next_turn_entity))
+                Clock.schedule_once(
+                    lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
     def hiden_video(self):
         '''
         oculta el video
@@ -267,23 +280,15 @@ class HomeScreen(MDScreen):
         self.pause_video()
         self.hiden_video()
         content_dialog_turn: ContentDialogTurnBoxLayout = ContentDialogTurnBoxLayout(turn_entity)
-        content_dialog_turn.refresh_label()
-        if not self.dialog:
+        self.list_turn_call_await.append(turn_entity)
+        if self.dialog is None:
             self.dialog = MDDialog(
                 type="custom",
                 content_cls=content_dialog_turn
             )
-        self.dialog.open()
-        Clock.schedule_once(lambda *args: self.sounds.text_to_speatch(message))
-        self.__configure_clock_interval()
-
-    def __configure_clock_interval(self):
-        '''
-        programa una detonacion dentro de unos segundos para cerrar el modal
-        :return:
-        '''
-        Clock.schedule_interval(callback=self.close_dialog_turn, timeout=integers.interval_time_dialog)
-
+            self.dialog.open()
+            Clock.schedule_once(lambda *args: self.sounds.text_to_speatch(message))
+            Clock.schedule_once(callback= lambda *args: self.close_dialog_turn(self.list_turn_call_await.pop(0)), timeout=integers.interval_time_dialog)
     def add_item_recycleview(self, turn_entity: TurnEntity):
         '''
         agrega los items al recycle view

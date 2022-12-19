@@ -1,4 +1,4 @@
-import app.common.constants.api_settings as ApiSettings
+from global_system_config import GlobalSystemSettings
 import requests
 import guid
 import json
@@ -12,7 +12,7 @@ class SignageApiData:
         list_signages: list[str] = []
         try:
             http_response = requests.get(
-                ApiSettings.host_base + ApiSettings.signage_by_office_endpoint + str(id_office),
+                GlobalSystemSettings().api_settings.host_base + GlobalSystemSettings().api_settings.signage_by_office_endpoint + str(id_office),
                 verify= False
             )
             if http_response.status_code == 200:

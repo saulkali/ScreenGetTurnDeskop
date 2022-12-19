@@ -1,5 +1,5 @@
 kivy==2.1.0
-https://github.com/kivymd/KivyMD/archive/master.zip
+kivymd==1.1.1
 ffpyplayer==4.3.5
 pygame==2.1.2
 guid==0.2.1
