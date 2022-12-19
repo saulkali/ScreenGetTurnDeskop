@@ -1,0 +1,11 @@
+kivy==2.1.0
+https://github.com/kivymd/KivyMD/archive/master.zip
+ffpyplayer==4.3.5
+pygame==2.1.2
+guid==0.2.1
+signalrcore==0.9.5
+gTTs==2.3.0
+pydantic==1.10.2
+playsound==1.2.2
+pytest==7.2.0
+coverage==7.0.0

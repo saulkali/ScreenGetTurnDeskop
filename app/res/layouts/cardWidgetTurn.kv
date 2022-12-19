@@ -1,0 +1,18 @@
+#:import CardWidgetTurn app.common.customWidgets.cardWidgetTurn
+<CardWidgetTurn>:
+    id:card
+    line_color:(0.2, 0.2, 0.2, 0.8)
+    style:"elevated"
+    name:''
+    size_hint_y:None
+    BoxLayout:
+        orientation:'vertical'
+        padding:dp(8)
+
+        MDLabel:
+            id:label_name
+            halign: "center"
+            text: root.name
+            bold: True
+            font_size:dp(24)
+

@@ -1,0 +1,1 @@
+interval_time_dialog:int = 5

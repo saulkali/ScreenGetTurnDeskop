@@ -1,0 +1,103 @@
+#:include app/res/layouts/cardWidgetTurn.kv
+#:import utils kivy.utils
+<HomeScreen>:
+    MDBoxLayout:
+        orientation: "vertical"
+        MDGridLayout:
+            cols: 2
+            Video:
+                id: video
+                keep_ratio: False
+                state:"play"
+                allow_stretch: True
+                size_hint: (1,1)
+            MDBoxLayout:
+                orientation: "vertical"
+
+                size_hint: (0.4,1)
+                MDLabel:
+                    id: label_title_turn_process
+                    text:"Turnos en atencion"
+                    halign: "center"
+                    size_hint: (1.0, 0.05)
+                    bold: True
+                    outline_color: 5, 5, 5, 1
+                    font_size:dp(32)
+                    canvas.before:
+                        Color:
+                            rgba: .5, .5, .5, 1
+                        Line:
+                            width: 4
+                            rectangle: self.x, self.y, self.width, self.height
+                MDList:
+                    id:list_turns_in_process
+                    size_hint: (1.0, 0.4)
+                    canvas.before:
+                        Color:
+                            rgba: .5, .5, .5, 1
+                        Line:
+                            width: 4
+                            rectangle: self.x, self.y, self.width, self.height
+                MDLabel:
+                    text:"Proximos turnos"
+                    halign: "center"
+                    size_hint: (1.0, 0.05)
+                    outline_color: 5, 5, 5, 1
+                    bold: True
+                    font_size:dp(32)
+                    canvas.before:
+                        Color:
+                            rgba: .5, .5, .5, 1
+                        Line:
+                            width: 4
+                            rectangle: self.x, self.y, self.width, self.height
+                MDCard:
+                    padding:dp(8)
+                    size_hint: (1.0, 0.4)
+                    canvas.before:
+                        Color:
+                            rgba: .5, .5, .5, 1
+                        Line:
+                            width: 4
+                            rectangle: self.x, self.y, self.width, self.height
+                    ScrollView:
+                        RecycleView:
+                            id:recycle_view_turns
+                            viewclass: 'CardWidgetTurn'
+                            RecycleGridLayout:
+                                default_size: None, dp(50)
+                                default_size_hint: 1,None
+                                size_hint_y: None
+                                height: self.minimum_height
+                                padding:dp(8)
+                                spacing:dp(8)
+                                cols: 2
+        MDBottomAppBar:
+            MDTopAppBar:
+                id:top_bar
+                title: "Sala: Orientacion y asesoria"
+                md_bg_color: utils.get_color_from_hex('#772582')
+                right_action_items: [["dots-vertical", lambda x: root.open_system_settings_screen()]]
+
+<ContentDialogTurnBoxLayout>:
+    size_hint: (1, None)
+    height: dp(200)
+    orientation:'vertical'
+    MDLabel:
+        id:label_title
+        halign: "center"
+        text: ''
+        bold: True
+        font_size:dp(24)
+    MDLabel:
+        id:label_name
+        text:"Turno32"
+        font_size:dp(52)
+        halign: "center"
+        bold: True
+    MDLabel:
+        id:label_window
+        halign: "center"
+        text: ''
+        bold: True
+        font_size:dp(24)
