@@ -7,6 +7,7 @@ from app.common.entities.turn_entity import TurnEntity
 from app.common.entities.room_office_display_entity import RoomOfficeDisplayEntity
 from app.common.entities.turn_display_entity import TurnDisplayEntity
 from app.common.customWidgets.cardWidgetTurn.cardWidgetTurn import CardWidgetTurn
+from app.common.customWidgets.cardWidgetTurnInProcess.cardWidgetTurnInProcess import CardWidgetTurnInProcess
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.boxlayout import BoxLayout
 from helper import getFile
@@ -22,10 +23,9 @@ import guid
 import app.common.values.integers as integers
 from global_system_config import GlobalSystemSettings
 from kivy.clock import Clock
+from datetime import datetime
 
 Builder.load_file(getFile("app/res/layouts/home.kv"))
-
-
 class ContentDialogTurnBoxLayout(BoxLayout):
     turn_entity: TurnEntity
 
@@ -64,8 +64,12 @@ class HomeScreen(MDScreen):
         Clock.schedule_once(lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
         Clock.schedule_once(lambda *args: self.__setup_singal_r())
         Clock.schedule_once(lambda *args: self.get_signage())
+        Clock.schedule_interval(lambda *args:self.start_clock_time(),1)
         self.__setup_video()
 
+
+    def start_clock_time(self):
+        self.ids.label_clock_time.text = datetime.now().strftime("%d de %b. %Y %I:%M:%S %p")
 
     def open_system_settings_screen(self):
         self.manager.current = "system-settings-screen"
@@ -75,12 +79,11 @@ class HomeScreen(MDScreen):
 
     def get_signage(self):
         try:
-            print("obteniendo videos")
             self.list_videos = self.signage_business.get_signages(self.room_office_display_entity.idOffice)
-            print("mostrando lista de videos")
-            print(self.list_videos)
+
             if len(self.list_videos) is not 0:
                 self.play_video(GlobalSystemSettings().system_settings.path_files_videos + self.list_videos[self.position_video], True)
+
         except Exception as error:
             Snackbar(text=f"Error al intentar obtener los videos {error}").open()
 
@@ -93,7 +96,7 @@ class HomeScreen(MDScreen):
         '''
         self.room_office_display_entity = self.room_business.get_room_office_by_code(code)
         if self.room_office_display_entity is not None:
-            self.ids.top_bar.title = f"Oficina: {self.room_office_display_entity.nameOffice} Sala: {self.room_office_display_entity.nameRoom}"
+            self.ids.top_bar.title = f"Sala: {self.room_office_display_entity.nameRoom} {self.room_office_display_entity.nameOffice}"
             self.turns_business.get_turns(self.room_office_display_entity.idRoom)
             self.__set_turns_display()
 
@@ -105,7 +108,8 @@ class HomeScreen(MDScreen):
         :return:
         '''
         self.ids.recycle_view_turns.data = []
-        self.ids.list_turns_in_process.clear_widgets()
+        self.ids.recycle_view_turns_in_process.data = []
+
         turn_display_entity: TurnDisplayEntity = self.turns_business.get_turns(self.room_office_display_entity.idRoom)
         if turn_display_entity is not None:
             for turn in (turn_display_entity.waitingTurns1 + turn_display_entity.waitingTurns2):
@@ -113,19 +117,16 @@ class HomeScreen(MDScreen):
                     "name": turn.turn
                 })
             if turn_display_entity.actualTurn is not None:
-                item_list_turn = OneLineListItem(
-                    text=turn_display_entity.actualTurn.turn,
-                    bg_color= get_color_from_hex('#772582'),
-                    text_color= (1,1,1,1)
-                )
-                self.ids.list_turns_in_process.add_widget(item_list_turn)
+                self.ids.recycle_view_turns_in_process.data.append({
+                    "name": turn_display_entity.actualTurn.turn,
+                    "window": turn_display_entity.actualTurn.window
+                })
             if turn_display_entity.recentTurn is not None:
-                item_list_turn_after = OneLineListItem(
-                    text=turn_display_entity.recentTurn.turn
-                )
-                self.ids.list_turns_in_process.add_widget(item_list_turn_after)
 
-            Snackbar(text="agregados :)").open()
+                self.ids.recycle_view_turns_in_process.data.append({
+                    "name":turn_display_entity.recentTurn.turn,
+                    "window": turn_display_entity.recentTurn.window
+                })
 
     def on_call_turn(self,data):
         '''
@@ -150,9 +151,7 @@ class HomeScreen(MDScreen):
         :param args:
         :return:
         '''
-        print(args)
         Clock.schedule_once(lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
-        Snackbar(text="nuevo turno agregado en espera").open()
 
     def __setup_singal_r(self):
         '''
@@ -221,6 +220,7 @@ class HomeScreen(MDScreen):
         self.position_video += 1
         if self.position_video > len(self.list_videos):
             self.position_video = 0
+
         self.play_video(GlobalSystemSettings().system_settings.path_files_videos + self.list_videos[self.position_video], True)
 
 

@@ -1,10 +1,8 @@
-from kivy.properties import ObjectProperty,StringProperty
+from kivy.properties import StringProperty
 from kivymd.uix.card import MDCard
-from app.common.entities.turn_entity import TurnEntity
 
-
-
-class CardWidgetTurn(MDCard):
-    name: TurnEntity = ObjectProperty(None)
+class CardWidgetTurnInProcess(MDCard):
+    name: str  = StringProperty()
+    window: str = StringProperty()
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)

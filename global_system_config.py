@@ -16,7 +16,7 @@ class GlobalSystemSettings:
         try:
             name_file = "api_settings"
             api_settings = open(getFile(self.system_settings.path_file_cache+name_file), "rb")
-            self.system_settings = pickle.load(api_settings)
+            self.api_settings = pickle.load(api_settings)
             print("settings api settings loaded")
         except Exception as error:
             print(error)

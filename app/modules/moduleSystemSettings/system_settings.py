@@ -1,4 +1,6 @@
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.snackbar import Snackbar
+
 from kivy.lang import Builder
 from helper import getFile
 from global_system_config import GlobalSystemSettings
@@ -16,4 +18,9 @@ class SystemSettingsScreen(MDScreen):
         self.manager.current = "home-screen"
 
     def save_settings(self):
+        GlobalSystemSettings().system_settings.number_screen = int(self.ids.text_field_number_screen.text)
+        GlobalSystemSettings().api_settings.host_base = self.ids.text_field_url_api.text
         GlobalSystemSettings().save()
+
+        self.open_home_screen()
+        Snackbar(text="Los ajustes se guardaron de manera correcta").open()
