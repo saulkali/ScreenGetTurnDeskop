@@ -3,6 +3,7 @@ from pygame import mixer
 from playsound import playsound
 from global_system_config import GlobalSystemSettings
 import os
+import app.common.values.strings as Strings
 from helper import getFile
 
 import time
@@ -15,9 +16,9 @@ class Sounds:
         :return:
         '''
         print("play audio")
-        if GlobalSystemSettings().system_settings.type_os in ["Darwin","Linux"]:
+        if GlobalSystemSettings().system_settings.type_os in Strings.type_os_unix:
             self.play_audio_in_unix(file_audio)
-        elif GlobalSystemSettings().system_settings.type_os is "Windows":
+        elif GlobalSystemSettings().system_settings.type_os is Strings.type_os_windows:
             self.play_audio_in_windows(file_audio)
         else:
             print("no se pudo reproducir el audio plataforma desconocida")

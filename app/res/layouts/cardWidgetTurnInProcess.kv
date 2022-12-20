@@ -1,10 +1,14 @@
 #:import CardWidgetTurnInProcess app.common.customWidgets.cardWidgetTurnInProcess
 <CardWidgetTurnInProcess>:
     id:cardInTurn
+    ripple_behavior: True
     line_color:(0.2, 0.2, 0.2, 0.8)
     style:"elevated"
     name:''
     window:''
+    color_card: (1,1,1,1)
+    text_color_general: (0,0,0,0)
+    md_bg_color: root.color_card
     size_hint_y:None
     BoxLayout:
         orientation:'horizontal'
@@ -13,14 +17,21 @@
             id:label_name
             halign: "center"
             text: root.name
+            theme_text_color: "Custom"
+            text_color: root.text_color_general
             bold: True
             font_size:dp(24)
         MDIcon:
             icon: 'arrow-right-circle'
             font_size: dp(32)
+            theme_text_color:'Custom'
+            text_icon_color: root.text_color_general
+
         MDLabel:
             id: label_window
             text:root.window
+            theme_text_color: "Custom"
+            text_color: root.text_color_general
             bold: True
             font_size:dp(24)
             halign: "center"

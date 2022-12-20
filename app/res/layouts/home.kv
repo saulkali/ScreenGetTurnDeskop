@@ -38,18 +38,22 @@
                         Line:
                             width: 4
                             rectangle: self.x, self.y, self.width, self.height
-                    ScrollView:
-                        RecycleView:
-                            id:recycle_view_turns_in_process
-                            viewclass: 'CardWidgetTurnInProcess'
-                            RecycleGridLayout:
-                                default_size: None, dp(50)
-                                default_size_hint: 1,None
-                                size_hint_y: None
-                                height: self.minimum_height
-                                padding:dp(8)
-                                spacing:dp(8)
-                                cols: 2
+                    AnchorLayout:
+                        anchor_x:'center'
+                        anchor_y:'bottom'
+                        size_hint: (1.0, 0.2)
+                        ScrollView:
+                            RecycleView:
+                                id:recycle_view_turns_in_process
+                                viewclass: 'CardWidgetTurnInProcess'
+                                RecycleGridLayout:
+                                    default_size: None, dp(50)
+                                    default_size_hint: 1,None
+                                    size_hint_y: None
+                                    height: self.minimum_height
+                                    padding:dp(8)
+                                    spacing:dp(8)
+                                    cols: 1
                 MDLabel:
                     text:"Proximos turnos"
                     halign: "center"
@@ -109,7 +113,7 @@
         theme_text_color:"Custom"
         text_color: utils.get_color_from_hex('#037b9e')
         bold: True
-        font_size:dp(24)
+        font_size:dp(64)
     MDLabel:
         id:label_name
         text:"Turno32"

@@ -1,7 +1,10 @@
+import os.path
+
 from kivymd.uix.screen import MDScreen
 from kivy.lang import Builder
+from kivy import utils
 from kivymd.uix.snackbar import Snackbar
-from kivymd.uix.list import OneLineListItem
+
 from app.common.utils.sounds import Sounds
 from app.common.entities.turn_entity import TurnEntity
 from app.common.entities.room_office_display_entity import RoomOfficeDisplayEntity
@@ -119,13 +122,16 @@ class HomeScreen(MDScreen):
             if turn_display_entity.actualTurn is not None:
                 self.ids.recycle_view_turns_in_process.data.append({
                     "name": turn_display_entity.actualTurn.turn,
-                    "window": turn_display_entity.actualTurn.window
+                    "window": turn_display_entity.actualTurn.window,
+                    "color_card": utils.get_color_from_hex("#772582"),
+                    "text_color_general": utils.get_color_from_hex("#FFFFFF")
                 })
             if turn_display_entity.recentTurn is not None:
-
                 self.ids.recycle_view_turns_in_process.data.append({
                     "name":turn_display_entity.recentTurn.turn,
-                    "window": turn_display_entity.recentTurn.window
+                    "window": turn_display_entity.recentTurn.window,
+                    "color_card": utils.get_color_from_hex("#FFFFFF"),
+                    "text_color_general": utils.get_color_from_hex("#000000")
                 })
 
     def on_call_turn(self,data):
@@ -139,7 +145,7 @@ class HomeScreen(MDScreen):
             turn_entity: TurnEntity = TurnEntity.parse_obj(data[0])
             if turn_entity is not None:
                 Clock.schedule_once(
-                    lambda *args: self.show_dialog_turn(f"turno {turn_entity.turn} {turn_entity.window}",
+                    lambda *args: self.show_dialog_turn(f"turno { (turn_entity.turn[0:1] + ' ' + turn_entity.turn[1:len(turn_entity.turn)])} {turn_entity.window}",
                                                         turn_entity))
                 Clock.schedule_once(lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
 
@@ -167,7 +173,6 @@ class HomeScreen(MDScreen):
                     "verify_ssl": False
                     }
                 ) \
-                .configure_logging(logging.DEBUG) \
                 .with_automatic_reconnect({
                     "type": "raw",
                     "keep_alive_interval": 10,
@@ -307,10 +312,14 @@ class HomeScreen(MDScreen):
         :return:
         '''
         try:
-            if player_local is True:
-                self.ids.video.source = getFile(path_video)
+            if os.path.exists(path_video):
+                if player_local is True:
+                    self.ids.video.source = getFile(path_video)
+                else:
+                    self.ids.video.source = path_video
+                self.resumen_video()
             else:
-                self.ids.video.source = path_video
-            self.resumen_video()
+                self.__next_video(None,None)
+
         except Exception as error:
             Snackbar(text=f"Error al reproducir video: {error}").open()

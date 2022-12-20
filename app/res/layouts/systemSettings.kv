@@ -61,15 +61,21 @@
                     bold: True
                     size_hint: (1,0.2)
                     font_size:dp(32)
+                MDChip:
+                    id:mdcp_launch_automatic
+                    text: "Iniciar automaticamente al reiniciar windows"
+                    icon_left: "refresh-auto"
+                    on_active: root.create_auto_launch()
+                    line_color: app.theme_cls.disabled_hint_text_color
+                    elevation: 4
 
-                MDLabel:
-                    text:'iniciar automaticamente al reiniciar windows'
-                MDSwitch:
-                    id: shCreateAutoLaunch
-                MDLabel:
-                    text:'Actualizaciones Automaticas'
-                MDSwitch:
-                    id: shUpdateAutomatic
+                MDChip:
+                    id: mdcp_update_automatic
+                    text: "Activar actualizaciones automaticas"
+                    icon_left: "update"
+                    on_active:
+                    line_color: app.theme_cls.disabled_hint_text_color
+                    elevation: 4
         MDFloatingActionButton:
             icon: "content-save"
             md_bg_color: app.theme_cls.primary_color
