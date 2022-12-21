@@ -4,8 +4,8 @@ class ApiSettings:
     hub_signal_r = "signalrServer"
 
     #events for websockets
-    call_turn_endpoint: str = "CallTurn/"
-    get_turn_endpoint: str = "GetTurns/"
+    call_turn_hub_reference: str = "CallTurn/"
+    get_turn_hub_reference: str = "GetTurns/"
 
     #endpoints api rest
     turns_by_room_endpoint: str = "api/SHIFTASSIGNMENT/TurnsByRoom/" #{id_room}

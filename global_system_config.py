@@ -24,15 +24,17 @@ class GlobalSystemSettings:
 
     def __load_system_settings(self):
         try:
-            name_file = "api_settings"
+            name_file = "system_settings"
             system_settings = open(getFile(self.system_settings.path_file_cache+name_file), "rb")
             self.system_settings = pickle.load(system_settings)
             print("settings api settings loaded")
         except Exception as error:
             print(error)
             print("settings api settings not found")
+
     def __read_files_pickles(self):
         self.__load_api_settings()
+        self.__load_system_settings()
 
     def save(self):
         with open(getFile(self.system_settings.path_file_cache+"system_settings"), "wb") as system_settings_pickle_in:

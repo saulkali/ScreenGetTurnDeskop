@@ -1,0 +1,33 @@
+
+===================== MONTAR ENTORNO VIRTUAL ==============================================
+antes de iniciar debemos de tener en cuenta estos puntos, tener un entorno virtual de python desplegado
+se puede usar virtualenv para este caso con los siguientes comandos
+
+>>> pip install virtualenv
+>>> virtualenv venv
+
+esto te va a crear una carpeta llamada venv.
+
+===================== ACTIVAR ENTORNO VIRTUAL ==========================================================
+activas el entorno virtual.
+
+<para windows>
+
+>>> .\venv\Scripts\activate
+
+<en linux>
+
+>>> source venv/bin/activate
+
+============================== INSTALAR MODULOS DE PYTHON ===================================
+
+una vez creado el entorno virtual ahora es necesario importar todos los modulos que depende la aplicacion
+
+(venv)>>> pip install -r requerimients.txt
+
+============================= CREAR BINARIO DE LA APLICACION ==========================================================
+
+para crear el binario de la aplicacion, hay que tener en cuenta que es necesario tener el modulo instalado de pyinstaller
+
+(venv)>>> pip install pyinstaller
+(venv)>>> pyinstaller --onefile --noconsole --add-data="/app/res/*;app/res/" main.py

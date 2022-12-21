@@ -27,6 +27,7 @@ import app.common.values.integers as integers
 from global_system_config import GlobalSystemSettings
 from kivy.clock import Clock
 from datetime import datetime
+from threading import Thread
 
 Builder.load_file(getFile("app/res/layouts/home.kv"))
 class ContentDialogTurnBoxLayout(BoxLayout):
@@ -115,9 +116,12 @@ class HomeScreen(MDScreen):
 
         turn_display_entity: TurnDisplayEntity = self.turns_business.get_turns(self.room_office_display_entity.idRoom)
         if turn_display_entity is not None:
-            for turn in (turn_display_entity.waitingTurns1 + turn_display_entity.waitingTurns2):
+            for turn_entity in (turn_display_entity.waitingTurns1 + turn_display_entity.waitingTurns2):
                 self.ids.recycle_view_turns.data.append({
-                    "name": turn.turn
+                    "name": turn_entity.turn,
+                    "md_bg_color": utils.get_color_from_hex("#000000") if turn_entity.appointment else utils.get_color_from_hex("#FFFFFF"),
+                    "theme_text_color": "Custom",
+                    "text_color": utils.get_color_from_hex("#FFFFFF") if turn_entity.appointment else utils.get_color_from_hex("#000000")
                 })
             if turn_display_entity.actualTurn is not None:
                 self.ids.recycle_view_turns_in_process.data.append({
@@ -186,11 +190,11 @@ class HomeScreen(MDScreen):
             self.hub_connection.on_error(lambda data: print(f"An exception was thrown closed{data.error}"))
 
             self.hub_connection.on(
-                GlobalSystemSettings().api_settings.call_turn_endpoint + self.room_office_display_entity.idRoom.__str__(),
+                GlobalSystemSettings().api_settings.call_turn_hub_reference + self.room_office_display_entity.idRoom.__str__(),
                 callback_function=self.on_call_turn
             )
             self.hub_connection.on(
-                GlobalSystemSettings().api_settings.get_turn_endpoint + self.room_office_display_entity.idRoom.__str__(),
+                GlobalSystemSettings().api_settings.get_turn_hub_reference + self.room_office_display_entity.idRoom.__str__(),
                 callback_function=self.on_get_turn
             )
             self.hub_connection.start()
@@ -223,7 +227,7 @@ class HomeScreen(MDScreen):
         :return:
         '''
         self.position_video += 1
-        if self.position_video > len(self.list_videos):
+        if self.position_video > len(self.list_videos) - 1:
             self.position_video = 0
 
         self.play_video(GlobalSystemSettings().system_settings.path_files_videos + self.list_videos[self.position_video], True)
@@ -248,6 +252,7 @@ class HomeScreen(MDScreen):
                                                         next_turn_entity))
                 Clock.schedule_once(
                     lambda *args: self.get_id_room(GlobalSystemSettings().system_settings.number_screen))
+
     def hiden_video(self):
         '''
         oculta el video
@@ -292,8 +297,11 @@ class HomeScreen(MDScreen):
                 content_cls=content_dialog_turn
             )
             self.dialog.open()
-            Clock.schedule_once(lambda *args: self.sounds.text_to_speatch(message))
+            thread_sound = Thread(target=lambda *args: self.sounds.text_to_speatch(message),args=())
+            thread_sound.start()
+
             Clock.schedule_once(callback= lambda *args: self.close_dialog_turn(self.list_turn_call_await.pop(0)), timeout=integers.interval_time_dialog)
+
     def add_item_recycleview(self, turn_entity: TurnEntity):
         '''
         agrega los items al recycle view
