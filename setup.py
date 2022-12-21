@@ -61,8 +61,7 @@ def copyfiles():
 def main():
     #commands pyinstaller
     commands = [
-        "main.py",
-        "--onedir"
+        getFile("setup.spec")
     ]
 
     PyInstaller.__main__.run(commands,)
