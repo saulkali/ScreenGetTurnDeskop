@@ -1,18 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
-import ffpyplayer
-FFPYPLAYER_PATH = ffpyplayer.__path__[0]
-
-
 block_cipher = None
-
 
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[
-        ('{}/*.so'.format(FFPYPLAYER_PATH), 'ffpyplayer'),
-        ('{}/player/*.so'.format(FFPYPLAYER_PATH), 'ffpyplayer/player'),
-    ],
+    binaries=[],
     datas=[],
     hiddenimports=[],
     hookspath=[],

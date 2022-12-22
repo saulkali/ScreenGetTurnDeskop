@@ -170,19 +170,28 @@ class HomeScreen(MDScreen):
         '''
         try:
             print("connect websocket")
+            import logging
+            import certifi
+            from signalrcore.protocol.messagepack_protocol import MessagePackHubProtocol
+            handler = logging.StreamHandler()
+            handler.setLevel(logging.DEBUG)
+
             self.hub_connection = HubConnectionBuilder() \
                 .with_url(
                     GlobalSystemSettings().api_settings.host_base + GlobalSystemSettings().api_settings.hub_signal_r,
                     options={
-                    "verify_ssl": False
+                        "verify_ssl": False
                     }
                 ) \
+                .configure_logging(logging.DEBUG, socket_trace=True, handler=handler)\
                 .with_automatic_reconnect({
                     "type": "raw",
                     "keep_alive_interval": 10,
                     "reconnect_interval": 5,
                     "max_attempts": 5
-                }).build()
+                }) \
+                .with_hub_protocol(MessagePackHubProtocol()) \
+                .build()
 
             self.hub_connection.on_open(
                 lambda: print("connection opened and handshake received ready to send messages"))
